@@ -1,0 +1,24 @@
+{
+  "name": "pdf-splitter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "@viniazvd && @guibarscevicius",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest --watchAll",
+    "dev": "nodemon index.js "
+  },
+  "dependencies": {
+    "hummus": "^1.0.90",
+    "koa": "^2.6.2",
+    "koa-bodyparser": "^4.2.1",
+    "koa-router": "^7.4.0",
+    "nodemon": "^1.18.6",
+    "pdf-text-extract": "^1.5.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-async-to-generator": "^7.1.0",
+    "jest": "^23.6.0",
+    "supertest": "^3.3.0"
+  }
+}
