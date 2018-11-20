@@ -9,6 +9,7 @@
     "dev": "nodemon index.js "
   },
   "dependencies": {
+    "babel-upgrade": "^0.0.24",
     "hummus": "^1.0.90",
     "koa": "^2.6.2",
     "koa-bodyparser": "^4.2.1",
@@ -17,7 +18,11 @@
     "pdf-text-extract": "^1.5.0"
   },
   "devDependencies": {
+    "@babel/node": "^7.0.0",
+    "@babel/core": "^7.0.0",
     "@babel/plugin-transform-async-to-generator": "^7.1.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^23.4.2",
     "jest": "^23.6.0",
     "supertest": "^3.3.0"
   }
