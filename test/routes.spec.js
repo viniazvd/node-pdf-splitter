@@ -10,11 +10,15 @@ afterAll(() => {
   console.log('server closed!')
 })
 
-describe('teste1', () => {
-  test('download', async () => {
-    const response = await request(server).post('/split-pdf')
-
-    expect(response.status).toEqual(200)
-    // expect(response.text).toContain('Hello World!')
+describe('testes', () => {
+  test('check status', () => {
+    const body = {
+      file: 'engenharia',
+      names: ['MATEUS FERNANDES SILVA LIMA', 'DOUGLAS ALMEIDA SILVA']
+    }
+    request(server)
+      .post('/split-pdf')
+      .send(body)
+      .expect(200)
   })
 })
