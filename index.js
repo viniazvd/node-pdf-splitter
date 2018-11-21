@@ -1,8 +1,3 @@
-const Koa = require('koa')
-const Router = require('koa-router')
-const bodyParser = require('koa-bodyparser')
-const cors = require('@koa/cors')
-
 const extract = require('pdf-text-extract')
 const hummus = require('hummus')
 const path = require('path')
@@ -10,23 +5,6 @@ const fs = require('fs')
 
 const sourcePDF = path.join(__dirname, './input/engenharia.pdf')
 const outputFolder = path.join(__dirname, '/output')
-
-const app = new Koa()
-const router = new Router()
-
-app.use(bodyParser())
-app.use(cors())
-
-// error handling
-app.use(async (ctx, next) => {
-  try {
-    await next()
-  } catch (err) {
-    ctx.status = err.status || 500
-    ctx.body = err.message
-    ctx.app.emit('error', err, ctx)
-  }
-})
 
 // function to encode file data to base64 encoded string
 // function base64_encode (file) {
@@ -51,9 +29,8 @@ function deleteDuplicates () {
     .filter(file => fs.unlinkSync(path.join(outputFolder, file)))
 }
 
-router.post('/split-pdf', async ctx => {
-  const { file, employees } = ctx.request.body
-
+function splitPDF (file, employees) {
+  console.log(file, employees)
   if (typeof file !== 'string' || !Array.isArray(employees)) return false
 
   // Delete any files that already exist in the output folder
@@ -103,12 +80,20 @@ router.post('/split-pdf', async ctx => {
         .end()
     })
   })
+}
 
-  ctx.type = { 'Content-Type': 'application/octet-stream' }
-  ctx.status = 200
-  ctx.body = { status: 'success', data: 'coe' }
-})
+const payload = {
+  file: 'engenharia',
+  employees: [
+    {
+      name: 'SAMUEL ALMEIDA CARDOSO',
+	    pages: [42, 43, 1]
+    },
+    {
+      name: 'LUIZA DA ROCHA GUERRA',
+      pages: [22]
+    }
+  ]
+}
 
-app.use(router.routes())
-
-app.listen(3000)
+splitPDF(payload.file, payload.employees)
