@@ -9,6 +9,7 @@
     "dev": "nodemon index.js "
   },
   "dependencies": {
+    "@koa/cors": "2",
     "babel-upgrade": "^0.0.24",
     "hummus": "^1.0.90",
     "koa": "^2.6.2",

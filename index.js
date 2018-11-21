@@ -1,6 +1,7 @@
 const Koa = require('koa')
 const Router = require('koa-router')
 const bodyParser = require('koa-bodyparser')
+const cors = require('@koa/cors')
 
 const extract = require('pdf-text-extract')
 const hummus = require('hummus')
@@ -14,6 +15,7 @@ const app = new Koa()
 const router = new Router()
 
 app.use(bodyParser())
+app.use(cors())
 
 // error handling
 app.use(async (ctx, next) => {
@@ -26,9 +28,9 @@ app.use(async (ctx, next) => {
   }
 })
 
-// // function to encode file data to base64 encoded string
+// function to encode file data to base64 encoded string
 // function base64_encode (file) {
-//   const buffer = fs.readFileSync(file)
+//   const buffer = fs.readFilec(file)
 
 //   // convert binary data to base64 encoded string
 //   return new Buffer(buffer).toString('base64')
@@ -49,51 +51,58 @@ function deleteDuplicates () {
     .filter(file => fs.unlinkSync(path.join(outputFolder, file)))
 }
 
-function match (word, words) {
-  const matches = word ? words.split(word).length - 1 : 0
-
-  return !!matches
-}
-
 router.post('/split-pdf', async ctx => {
-  const { file, names } = ctx.request.body
+  const { file, employees } = ctx.request.body
 
-  if (typeof file !== 'string' || !Array.isArray(names)) return false
+  if (typeof file !== 'string' || !Array.isArray(employees)) return false
 
   // Delete any files that already exist in the output folder
   deleteDuplicates()
 
-  // Pages will be an array of strings.
-  // Each item corresponds to a page in the PDF
-  extract(sourcePDF, (err, pages) => {
+  // pdfPages will be an array of strings.
+  // each item corresponds to a page in the PDF
+  extract(sourcePDF, (err, pdfPages) => {
     if (err) {
       console.error(err)
       return false
     }
 
-    names.forEach(name => {
-      const employeeIndex = pages.findIndex(item => match(name, item))
+    // const base64str = base64_encode('./input/engenharia.pdf')
+    // base64_decode(base64str, './output/engenharia2.pdf')
 
+    employees.forEach(({ name, pages }) => {
       const pdfWriter = hummus.createWriter(path.join(outputFolder, `${name}.pdf`))
+      const newPage = pdfWriter.createPage(0, 0, 595, 842)
 
-      const page = pdfWriter.createPage(0,0,595,842)
+      pages.forEach((page, index) => {
+        page = page - 1
 
-      pdfWriter.mergePDFPagesToPage(page,
-        sourcePDF,
-        {
-          type: hummus.eRangeTypeSpecific,
-          specificRanges: [
-            [employeeIndex, employeeIndex]
-          ]
-        })
+        if (index === 0) {
+          pdfWriter.mergePDFPagesToPage(newPage, sourcePDF,
+            {
+              type: hummus.eRangeTypeSpecific,
+              specificRanges: [
+                [page, page]
+              ]
+            }
+          )
+        } else {
+          pdfWriter.appendPDFPagesFromPDF(sourcePDF,
+            {
+              type: hummus.eRangeTypeSpecific,
+              specificRanges: [
+                [page, page]
+              ]
+            }
+          )
+        }
+      })
 
-      pdfWriter.writePage(page).end()
+      pdfWriter
+        .writePage(newPage)
+        .end()
     })
   })
-
-  // const base64str = base64_encode('./engenharia.pdf')
-
-  // base64_decode(base64str, './output/engenharia2.pdf')
 
   ctx.type = { 'Content-Type': 'application/octet-stream' }
   ctx.status = 200
@@ -102,7 +111,4 @@ router.post('/split-pdf', async ctx => {
 
 app.use(router.routes())
 
-const server = app.listen(3000)
-
-module.exports = server
-
+app.listen(3000)
