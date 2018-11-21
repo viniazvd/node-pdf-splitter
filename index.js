@@ -36,7 +36,10 @@ function splitPDF (file, employees) {
   deleteDuplicates()
 
   extract(sourcePDF, (err) => {
-    if (err) console.error(err); return false
+    if (err) {
+      console.error(err)
+      return false
+    }
 
     // const base64str = base64_encode('./input/engenharia.pdf')
     // base64_decode(base64str, './output/engenharia2.pdf')
