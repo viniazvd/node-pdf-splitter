@@ -30,19 +30,13 @@ function deleteDuplicates () {
 }
 
 function splitPDF (file, employees) {
-  console.log(file, employees)
   if (typeof file !== 'string' || !Array.isArray(employees)) return false
 
   // Delete any files that already exist in the output folder
   deleteDuplicates()
 
-  // pdfPages will be an array of strings.
-  // each item corresponds to a page in the PDF
-  extract(sourcePDF, (err, pdfPages) => {
-    if (err) {
-      console.error(err)
-      return false
-    }
+  extract(sourcePDF, (err) => {
+    if (err) console.error(err); return false
 
     // const base64str = base64_encode('./input/engenharia.pdf')
     // base64_decode(base64str, './output/engenharia2.pdf')
@@ -75,9 +69,7 @@ function splitPDF (file, employees) {
         }
       })
 
-      pdfWriter
-        .writePage(newPage)
-        .end()
+      pdfWriter.writePage(newPage).end()
     })
   })
 }
