@@ -5,44 +5,41 @@ const fs = require('fs')
 
 const sourcePDF = path.join(__dirname, './input/engenharia.pdf')
 const outputFolder = path.join(__dirname, '/output')
+const tempPDF = path.join(__dirname, './temp.pdf')
 
 // function to encode file data to base64 encoded string
-// function base64_encode (file) {
-//   const buffer = fs.readFilec(file)
+function base64_encode (file) {
+  const buffer = fs.readFileSync(file)
 
-//   // convert binary data to base64 encoded string
-//   return new Buffer(buffer).toString('base64')
-// }
+  // convert binary data to base64 encoded string
+  return new Buffer.from(buffer).toString('base64')
+}
 
 // // function to create file from base64 encoded string
-// function base64_decode (base64str, fileName) {
-//   fs.writeFile(fileName, base64str, 'base64', function (err) {
-//     const handleMessage = err || 'The file was created!'
+function base64_decode (base64str) {
+  fs.writeFile('temp.pdf', base64str, 'base64', err => err && console.log(err))
+}
 
-//     console.log(handleMessage)
-//   })
-// }
-
-function deleteDuplicates () {
+// Delete any files that already exist in folder
+function deleteDuplicates (folder) {
   fs
-    .readdirSync(outputFolder)
-    .filter(file => fs.unlinkSync(path.join(outputFolder, file)))
+    .readdirSync(folder)
+    .filter(file => fs.unlinkSync(path.join(folder, file)))
 }
 
 function splitPDF (file, employees) {
-  if (typeof file !== 'string' || !Array.isArray(employees)) return false
+  if (typeof file !== 'string' || !Array.isArray(employees)) {
+    console.log('erro mané')
+    return false
+  }
 
-  // Delete any files that already exist in the output folder
-  deleteDuplicates()
+  deleteDuplicates(outputFolder)
 
-  extract(sourcePDF, (err) => {
+  extract(tempPDF, (err) => {
     if (err) {
       console.error(err)
       return false
     }
-
-    // const base64str = base64_encode('./input/engenharia.pdf')
-    // base64_decode(base64str, './output/engenharia2.pdf')
 
     employees.forEach(({ name, pages }) => {
       const pdfWriter = hummus.createWriter(path.join(outputFolder, `${name}.pdf`))
@@ -74,11 +71,14 @@ function splitPDF (file, employees) {
 
       pdfWriter.writePage(newPage).end()
     })
+
+    // remove temp.pdf file
+    fs.unlinkSync(path.join(__dirname, 'temp.pdf'))
   })
 }
 
 const payload = {
-  file: 'engenharia',
+  file: base64_encode(sourcePDF),
   employees: [
     {
       name: 'SAMUEL ALMEIDA CARDOSO',
@@ -90,5 +90,7 @@ const payload = {
     }
   ]
 }
+
+base64_decode(payload.file)
 
 splitPDF(payload.file, payload.employees)
