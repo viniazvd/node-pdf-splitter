@@ -3,7 +3,7 @@ const hummus = require('hummus')
 const path = require('path')
 const fs = require('fs')
 
-const sourcePDF = path.join(__dirname, './input/engenharia.pdf')
+const inputPdfFake = path.join(__dirname, './input/engenharia.pdf')
 const outputFolder = path.join(__dirname, '/output')
 const tempPDF = path.join(__dirname, './temp.pdf')
 
@@ -49,7 +49,7 @@ function splitPDF (file, employees) {
         page = page - 1
 
         if (index === 0) {
-          pdfWriter.mergePDFPagesToPage(newPage, sourcePDF,
+          pdfWriter.mergePDFPagesToPage(newPage, inputPdfFake,
             {
               type: hummus.eRangeTypeSpecific,
               specificRanges: [
@@ -58,7 +58,7 @@ function splitPDF (file, employees) {
             }
           )
         } else {
-          pdfWriter.appendPDFPagesFromPDF(sourcePDF,
+          pdfWriter.appendPDFPagesFromPDF(inputPdfFake,
             {
               type: hummus.eRangeTypeSpecific,
               specificRanges: [
@@ -78,7 +78,7 @@ function splitPDF (file, employees) {
 }
 
 const payload = {
-  file: base64_encode(sourcePDF),
+  file: base64_encode(inputPdfFake),
   employees: [
     {
       name: 'SAMUEL ALMEIDA CARDOSO',
